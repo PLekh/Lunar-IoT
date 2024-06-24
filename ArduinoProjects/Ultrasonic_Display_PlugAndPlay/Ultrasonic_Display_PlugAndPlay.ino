@@ -1,34 +1,23 @@
-//www.elegoo.com
-//2016.12.08
-#include "SR04.h"
-#include <LiquidCrystal.h>
+#include <Arduino.h>
 
-LiquidCrystal lcd(0, 1, 2, 3, 4, 5);
 
-#define TRIG_PIN 12
-#define ECHO_PIN 13
-SR04 sr04 = SR04(ECHO_PIN,TRIG_PIN);
-long a;
+#define LEN(arr) ((int) (sizeof (arr) / sizeof (arr)[0]))
+#define closeTo(num, check) (num > check -10 & num < check + 10)
+
+int ports[1][13] = {
+  {2,3,4,5,6,7,8,9,10,11,12,13,0}
+};
 
 void setup() {
-  pinMode(11, OUTPUT);
-  digitalWrite(11, HIGH);
-   Serial.begin(9600);
-   delay(1000);
-   lcd.begin(16, 2);
-  // Print a message to the LCD.
-  lcd.print("Hello, World!");
-   
+  for (int i; i<LEN(ports); i++){
+    Detect(ports[i][0]);
+  }
+     
 }
 
 void loop() {
-   a=sr04.Distance();
-   Serial.print(a);
-   Serial.println("cm");
   
-  lcd.setCursor(0, 1);
-  // print the number of seconds since reset:
-  lcd.print(millis() / 1000);
-
-   delay(1000);
 }
+
+
+
