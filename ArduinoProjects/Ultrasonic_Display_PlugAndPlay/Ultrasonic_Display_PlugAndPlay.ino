@@ -11,8 +11,10 @@
 #define licr 914
 #define sese 100
 
-byte codes[NumPorts];
-byte types[NumPorts];
+
+byte codes[NumPorts] = { };
+byte types[NumPorts] = { };
+byte priorities[NumPorts] = { };
 const byte ports[NumPorts][NumPins] = {
   {2,3,4,5,6,7,8,9,10,11,12,13,0}
 };
@@ -37,13 +39,16 @@ void Initiate(byte Port[], int i){
   if(closeTo(detectionVal, licr)){
     codes[i] = licr;
     types[i] = DisplayCode;
+    priorities[i] = 0;
   }
   else if(closeTo(detectionVal, sese)){
     codes[i] = sese;
     types[i] = DisplayCode;
+    priorities[i] = 1;
   }
   else{
     codes[i] = 0;
     types[i] = EmptyCode;
+    priorities[i] = 254;
   }
 }
