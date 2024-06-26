@@ -11,7 +11,7 @@
 #define licr 914
 #define sese 100
 #define sensor1 1
-#define delaytime = 1000
+#define delaytime 1000
 
 
 byte codes[NumPorts] = { };
@@ -42,14 +42,14 @@ if (currentMillis - previousMillis >= delaytime) {
     int sensorval1 = analogRead(sensor1);
   char sensorval1str[5];
   sprintf(sensorval1str,"%d", sensorval1);
-  //Serial.println(sensorval1str);
+  Serial.println(sensorval1str);
   ExtDisp(sensorval1str);
     
   }
 
 }
 
-void ExtDisp(printstring){
+void ExtDisp(char printstring[]){
 
   /*for(byte i = 0; i <= LEN(types)-1; i++){
     if(types[i] == 1 & codes[i] == licr){
@@ -62,58 +62,61 @@ void ExtDisp(printstring){
     else{
       Serial.println("Display not found, printstring is %s", printstring)
     }*/
-    byte bestport = BestPort(DisplayCode)
-    if(code[bestport] == licr){
-        LiquidCrystal lcd(ports[bestport][0], ports[bestport][1], ports[bestport][2]
-        , ports[bestport][3]ports[bestport][4], ports[bestport][5]);
-
+    byte bestport = BestPort(DisplayCode);
+    if(codes[bestport] == licr){
+        //LiquidCrystal lcd(ports[bestport][0], ports[bestport][1], ports[bestport][2], ports[bestport][3]ports[bestport][4], ports[bestport][5]);
+        LiquidCrystal lcd(ports[bestport][0], ports[bestport][1], ports[bestport][2], ports[bestport][3], ports[bestport][4], ports[bestport][5]);
         lcd.begin(16,2);
         lcd.print(printstring);
     }
 
+    else{
+      Serial.println("LCD not connected");
+    }
+
   }
 
-void BestPort(int typeOfComponent){
+byte BestPort(int typeOfComponent){
   int highvalue = 0;
-  int value = 0
+  int value = 0;
   byte bestport = 0;
   
   for(byte i = 0; i <= LEN(types)-1; i++){
     
-    if(type[i] == typeOfComponent){
-      value = priorities[i] - used[i] * 2
+    if(types[i] == typeOfComponent){
+      value = priorities[i] - used[i] * 2;
       
       if(highvalue < value){
-        highvalue = value
+        highvalue = value;
         bestport = i;
       }
     }
   }
-  return bestport
-}
 
+return bestport;
 }
 
 void Initiate(byte Port[], int i){
-
+  Serial.println("Inside Initiate");
+  delay(1000);
   unsigned int detectionVal = analogRead(Port[LEN(Port)-1]);
 
   if(closeTo(detectionVal, licr)){
     codes[i] = licr;
     types[i] = DisplayCode;
     priorities[i] = 0;
-    Serial.println("Port %d has a Liquid Crystal", i);
+    Serial.println("Port has a Liquid Crystal");
   }
   else if(closeTo(detectionVal, sese)){
     codes[i] = sese;
     types[i] = DisplayCode;
     priorities[i] = 1;
-    Serial.println("Port %d has a Seven Segment", i);
+    Serial.println("Port has a Seven Segment");
   }
   else{
     codes[i] = 0;
     types[i] = EmptyCode;
     priorities[i] = 254;
-    Serial.println("Port %d is empty", i);
+    Serial.println("Port is empty");
   }
 }
