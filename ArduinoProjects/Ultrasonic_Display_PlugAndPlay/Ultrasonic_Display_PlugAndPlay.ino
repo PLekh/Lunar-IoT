@@ -26,7 +26,7 @@ unsigned long previousMillis = 0;
 
 void setup() {
   Serial.begin(9600);
-  delay(1000);
+  //delay(1000);
     for (byte i; i<LEN(ports); i++){
     Initiate(ports[i], i);
   }
@@ -128,4 +128,12 @@ void Initiate(byte Port[], int i){
     priorities[i] = 254;
     Serial.println("Port is empty");
   }
+  Serial.println("codes is");
+  Serial.println(codes[0]);
+  Serial.println("types is");
+  Serial.println(types[0]);
+  Serial.println("priorities is");
+  Serial.println(priorities[0]);
 }
+
+
