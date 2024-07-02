@@ -8,17 +8,18 @@
 #define DistanceCode 2
 #define NumPorts 1
 #define NumPins 13
-#define licr 914
+//#define licr 914
+#define licr 92
 #define sese 100
 #define sensor1 1
 #define delaytime 1000
 
 
-byte codes[NumPorts] = { };
-byte types[NumPorts] = { };
-byte used[NumPorts] = { };
-byte priorities[NumPorts] = { };
-const byte ports[NumPorts][NumPins] = {
+int codes[NumPorts] = { };
+int types[NumPorts] = { };
+int used[NumPorts] = { };
+int priorities[NumPorts] = { };
+const int ports[NumPorts][NumPins] = {
   {2,3,4,5,6,7,8,9,10,11,12,13,0}
 };
 
@@ -26,9 +27,9 @@ unsigned long previousMillis = 0;
 
 void setup() {
   Serial.begin(9600);
-  //delay(1000);
-    for (byte i; i<LEN(ports); i++){
-    Initiate(ports[i], i);
+  delay(1000);
+    for (int i; i<LEN(ports); i++){
+    Initiate(i);
   }
   
 }
@@ -42,9 +43,19 @@ void loop() {
     int sensorval1 = analogRead(sensor1);
     char sensorval1str[5];
     sprintf(sensorval1str,"%d", sensorval1);
-    Serial.println(sensorval1str);
+    Serial.println("Sensor Value is ");
+    Serial.print(sensorval1str);
     ExtDisp(sensorval1str);
     
+    Serial.println("codes is ");
+    Serial.print(codes[0]);
+    Serial.println("types is ");
+    Serial.print(types[0]);
+    Serial.println("priorities is ");
+    Serial.print(priorities[0]);
+    Serial.println("Display Value is ");
+    Serial.println(analogRead(A0));
+    memset(used, 0, NumPorts);
   }
 
 }
@@ -62,16 +73,24 @@ void ExtDisp(char printstring[]){
     else{
       Serial.println("Display not found, printstring is %s", printstring)
     }*/
-    byte bestport = BestPort(DisplayCode);
+
+    LiquidCrystal begin(){
+      
+
+      return lcd;
+    }
+
+    int bestport = BestPort(DisplayCode);
     if(codes[bestport] == licr){
       Serial.println("The best port is an LCD");
       Serial.println("The printstring is ");
-      Serial.print(printstring);
+      Serial.println(printstring);
       //LiquidCrystal lcd(ports[bestport][0], ports[bestport][1], ports[bestport][2], ports[bestport][3]ports[bestport][4], ports[bestport][5]);
       LiquidCrystal lcd(ports[bestport][0], ports[bestport][1], ports[bestport][2], ports[bestport][3], ports[bestport][4], ports[bestport][5]);
       lcd.begin(16,2);
       lcd.print(printstring);
       Serial.println("String printed on LCD");
+      used[bestport] = used[bestport]+1;
     }
 
     else{
@@ -80,13 +99,13 @@ void ExtDisp(char printstring[]){
 
   }
 
-byte BestPort(int typeOfComponent){
+int BestPort(int typeOfComponent){
   Serial.println("Inside bestPort");
   int highvalue = 0;
   int value = 0;
-  byte bestport = 0;
+  int bestport = 0;
   
-  for(byte i = 0; i <= LEN(types)-1; i++){
+  for(int i = 0; i <= LEN(types)-1; i++){
     
     if(types[i] == typeOfComponent){
       value = priorities[i] - used[i] * 2;
@@ -97,6 +116,8 @@ byte BestPort(int typeOfComponent){
       }
     }
   }
+
+
 Serial.println("The highest value is ");
 Serial.print(highvalue);
 Serial.println("The Best Port is ");
@@ -104,10 +125,13 @@ Serial.print(bestport);
 return bestport;
 }
 
-void Initiate(byte Port[], int i){
+void Initiate(int i){
   Serial.println("Inside Initiate");
   delay(1000);
-  unsigned int detectionVal = analogRead(Port[LEN(Port)-1]);
+  //unsigned int detectionVal = analogRead(Port[LEN(Port)-1]);
+  unsigned int detectionVal = analogRead(ports[i][12]);
+  Serial.println("The detection Port is ");
+  Serial.println(ports[i][12]);
   Serial.println("The Detection value is ");
   Serial.print(detectionVal);
   if(closeTo(detectionVal, licr)){
@@ -128,12 +152,13 @@ void Initiate(byte Port[], int i){
     priorities[i] = 254;
     Serial.println("Port is empty");
   }
-  Serial.println("codes is");
+  codes[0] == licr;
+  /*Serial.println("codes is");
   Serial.println(codes[0]);
   Serial.println("types is");
   Serial.println(types[0]);
   Serial.println("priorities is");
-  Serial.println(priorities[0]);
+  Serial.println(priorities[0]);*/
 }
 
 
