@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <LiquidCrystal.h>
+#include "SevSeg.h"
 
 #define LEN(arr) ((int) (sizeof (arr) / sizeof (arr)[0]))
 #define closeTo(num, check) (num > check -10 & num < check + 10)
@@ -10,15 +11,16 @@
 #define NumPins 13
 //#define licr 914
 #define licr 92
-#define sese 100
+#define sese 840
 #define sensor1 1
-#define delaytime 1000
+#define delaytime 300
 
 
 int codes[NumPorts] = { };
 int types[NumPorts] = { };
 int used[NumPorts] = { };
 int priorities[NumPorts] = { };
+int begun[NumPorts] = { };
 const int ports[NumPorts][NumPins] = {
   {2,3,4,5,6,7,8,9,10,11,12,13,0}
 };
@@ -74,12 +76,6 @@ void ExtDisp(char printstring[]){
       Serial.println("Display not found, printstring is %s", printstring)
     }*/
 
-    LiquidCrystal begin(){
-      
-
-      return lcd;
-    }
-
     int bestport = BestPort(DisplayCode);
     if(codes[bestport] == licr){
       Serial.println("The best port is an LCD");
@@ -93,11 +89,18 @@ void ExtDisp(char printstring[]){
       used[bestport] = used[bestport]+1;
     }
 
+    else if(codes[bestport] == sese){
+
+
+
+    }
+
     else{
       Serial.println("LCD not connected");
     }
 
   }
+
 
 int BestPort(int typeOfComponent){
   Serial.println("Inside bestPort");
@@ -118,11 +121,11 @@ int BestPort(int typeOfComponent){
   }
 
 
-Serial.println("The highest value is ");
-Serial.print(highvalue);
-Serial.println("The Best Port is ");
-Serial.print(bestport);
-return bestport;
+  Serial.println("The highest value is ");
+  Serial.print(highvalue);
+  Serial.println("The Best Port is ");
+  Serial.print(bestport);
+  return bestport;
 }
 
 void Initiate(int i){
