@@ -13,14 +13,13 @@
 #define licr 92
 #define sese 840
 #define sensor1 1
-#define delaytime 300
+#define delaytime 1000
 
 
 int codes[NumPorts] = { };
 int types[NumPorts] = { };
 int used[NumPorts] = { };
 int priorities[NumPorts] = { };
-int begun[NumPorts] = { };
 const int ports[NumPorts][NumPins] = {
   {2,3,4,5,6,7,8,9,10,11,12,13,0}
 };
@@ -29,7 +28,7 @@ unsigned long previousMillis = 0;
 
 void setup() {
   Serial.begin(9600);
-  delay(1000);
+  //delay(1000);
     for (int i; i<LEN(ports); i++){
     Initiate(i);
   }
@@ -90,8 +89,26 @@ void ExtDisp(char printstring[]){
     }
 
     else if(codes[bestport] == sese){
+      
+      Serial.println("Printing on Seven segment");
+      Serial.println("The print Value is ");
+      Serial.print(printstring);
+      SevSeg sevseg;
 
+      byte numDigits = 4;
+      byte digitPins[] = {ports[bestport][0], ports[bestport][1], ports[bestport][2], ports[bestport][3]};
+      byte segmentPins[] = {ports[bestport][4], ports[bestport][5], ports[bestport][6], ports[bestport][7], ports[bestport][8], ports[bestport][9], ports[bestport][10], ports[bestport][11]};
+      bool resistorsOnSegments = false; // 'false' means resistors are on digit pins
+      byte hardwareConfig = COMMON_CATHODE; // See README.md for options
+      bool updateWithDelays = false; // Default. Recommended
+      bool leadingZeros = false;
 
+      sevseg.begin(hardwareConfig, numDigits, digitPins, segmentPins, resistorsOnSegments, updateWithDelays, leadingZeros);
+      sevseg.setBrightness(90);
+
+      sevseg.refreshDisplay();
+
+      sevseg.setChars(printstring);
 
     }
 
@@ -130,7 +147,7 @@ int BestPort(int typeOfComponent){
 
 void Initiate(int i){
   Serial.println("Inside Initiate");
-  delay(1000);
+  //delay(1000);
   //unsigned int detectionVal = analogRead(Port[LEN(Port)-1]);
   unsigned int detectionVal = analogRead(ports[i][12]);
   Serial.println("The detection Port is ");
