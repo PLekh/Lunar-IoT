@@ -6,7 +6,7 @@
 #define closeTo(num, check) (num > check -10 & num < check + 10)
 #define EmptyCode 0
 #define DisplayCode 1
-#define DistanceCode 2
+#define PotCode 2
 #define NumPorts 1
 #define NumPins 13
 //#define licr 914
@@ -16,6 +16,7 @@
 #define delaytime 1000
 
 
+int initialized[NumPorts];
 int codes[NumPorts] = { };
 int types[NumPorts] = { };
 int used[NumPorts] = { };
@@ -23,6 +24,9 @@ int priorities[NumPorts] = { };
 const int ports[NumPorts][NumPins] = {
   {2,3,4,5,6,7,8,9,10,11,12,13,0}
 };
+
+SevSeg sevseg;
+LiquidCrystal lcd();
 
 unsigned long previousMillis = 0;
 
@@ -138,7 +142,7 @@ int BestPort(int typeOfComponent){
   }
 
 
-  Serial.println("The highest value is ");
+  Serial.println("The lowest priority value is ");
   Serial.print(highvalue);
   Serial.println("The Best Port is ");
   Serial.print(bestport);
@@ -150,7 +154,7 @@ void Initiate(int i){
   //delay(1000);
   //unsigned int detectionVal = analogRead(Port[LEN(Port)-1]);
   unsigned int detectionVal = analogRead(ports[i][12]);
-  Serial.println("The detection Port is ");
+  Serial.println("The detection Port is \n");
   Serial.println(ports[i][12]);
   Serial.println("The Detection value is ");
   Serial.print(detectionVal);
