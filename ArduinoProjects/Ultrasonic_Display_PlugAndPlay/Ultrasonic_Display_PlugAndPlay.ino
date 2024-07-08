@@ -16,7 +16,7 @@
 #define delaytime 1000
 
 
-int initialized[NumPorts];
+int begun[NumPorts] = { };
 int codes[NumPorts] = { };
 int types[NumPorts] = { };
 int used[NumPorts] = { };
@@ -81,15 +81,9 @@ void ExtDisp(char printstring[]){
 
     int bestport = BestPort(DisplayCode);
     if(codes[bestport] == licr){
-      Serial.println("The best port is an LCD");
-      Serial.println("The printstring is ");
-      Serial.println(printstring);
-      //LiquidCrystal lcd(ports[bestport][0], ports[bestport][1], ports[bestport][2], ports[bestport][3]ports[bestport][4], ports[bestport][5]);
-      LiquidCrystal lcd(ports[bestport][0], ports[bestport][1], ports[bestport][2], ports[bestport][3], ports[bestport][4], ports[bestport][5]);
-      lcd.begin(16,2);
-      lcd.print(printstring);
-      Serial.println("String printed on LCD");
-      used[bestport] = used[bestport]+1;
+      LCDprint(printstring, bestport);
+
+      
     }
 
     else if(codes[bestport] == sese){
@@ -151,7 +145,7 @@ int BestPort(int typeOfComponent){
 
 void Initiate(int i){
   Serial.println("Inside Initiate");
-  //delay(1000);
+  delay(1000);
   //unsigned int detectionVal = analogRead(Port[LEN(Port)-1]);
   unsigned int detectionVal = analogRead(ports[i][12]);
   Serial.println("The detection Port is \n");
@@ -176,7 +170,7 @@ void Initiate(int i){
     priorities[i] = 254;
     Serial.println("Port is empty");
   }
-  codes[0] == licr;
+  //codes[0] == licr;
   /*Serial.println("codes is");
   Serial.println(codes[0]);
   Serial.println("types is");
@@ -185,4 +179,36 @@ void Initiate(int i){
   Serial.println(priorities[0]);*/
 }
 
+
+void LCDprint(char printstring[]; int bestport){
+  if(begun[bestport] != licr){
+    Serial.println("Beginning LCD");
+    //LiquidCrystal lcd(ports[bestport][0], ports[bestport][1], ports[bestport][2], ports[bestport][3]ports[bestport][4], ports[bestport][5]);
+    LiquidCrystal lcd(ports[bestport][0], ports[bestport][1], ports[bestport][2], ports[bestport][3], ports[bestport][4], ports[bestport][5]);
+    lcd.begin(16,2);
+    begin(licr, bestport, 1);
+  }
+
+  Serial.println("The best port is an LCD");
+  Serial.println("The printstring is ");
+  Serial.println(printstring);
+
+  lcd.print(printstring);
+  Serial.println("String printed on LCD");
+  used[bestport] = used[bestport]+1;
+
+}
+
+
+void begin(int value, int pos, bool replace){
+  Serial.println("Inside begin");
+  if(replace){
+    for(int i=0; i < NumPorts; i++){
+      if(initialized[i] == value){
+        initialized[i] = 0;
+      }
+    }
+  }
+  initialized[pos] = value;
+}
 
