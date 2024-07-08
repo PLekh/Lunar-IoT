@@ -26,7 +26,6 @@ const int ports[NumPorts][NumPins] = {
 };
 
 SevSeg sevseg;
-LiquidCrystal lcd();
 
 unsigned long previousMillis = 0;
 
@@ -81,9 +80,16 @@ void ExtDisp(char printstring[]){
 
     int bestport = BestPort(DisplayCode);
     if(codes[bestport] == licr){
-      
-      LCDprint(printstring, bestport);
-      
+
+      Serial.println("The best port is an LCD");
+      Serial.println("The printstring is ");
+      Serial.println(printstring);
+      //LiquidCrystal lcd(ports[bestport][0], ports[bestport][1], ports[bestport][2], ports[bestport][3]ports[bestport][4], ports[bestport][5]);
+      LiquidCrystal lcd(ports[bestport][0], ports[bestport][1], ports[bestport][2], ports[bestport][3], ports[bestport][4], ports[bestport][5]);
+      lcd.begin(16,2);
+      lcd.print(printstring);
+      Serial.println("String printed on LCD");
+      used[bestport] = used[bestport]+1;
     }
 
     else if(codes[bestport] == sese){
@@ -157,7 +163,6 @@ void Initiate(int i){
     types[i] = DisplayCode;
     priorities[i] = 0;
     Serial.println("Port has a Liquid Crystal");
-
   }
   else if(closeTo(detectionVal, sese)){
     codes[i] = sese;
@@ -181,31 +186,7 @@ void Initiate(int i){
 }
 
 
-void LCDprint(char printstring[], int bestport){
-  
-  if(begun[bestport] != licr){
-    Serial.println("Beginning LCD");
-    //LiquidCrystal lcd(ports[bestport][0], ports[bestport][1], ports[bestport][2], ports[bestport][3]ports[bestport][4], ports[bestport][5]);
-    lcd(ports[bestport][0], ports[bestport][1], ports[bestport][2], ports[bestport][3], ports[bestport][4], ports[bestport][5]);
-    lcd.begin(16,2);
-    begin(licr, bestport, 1);
-  }
-
-  Serial.println("The best port is an LCD");
-  Serial.println("The printstring is ");
-  Serial.println(printstring);
-
-  lcd.print(printstring);
-  Serial.println("String printed on LCD");
-  used[bestport] = used[bestport]+1;
-
-}
-
-
-
-
-void begin(int value, int pos, bool replace){
-  Serial.println("Inside begin");
+/*void begin(int value, int pos, bool replace){
   if(replace){
     for(int i=0; i < NumPorts; i++){
       if(begun[i] == value){
@@ -215,4 +196,4 @@ void begin(int value, int pos, bool replace){
   }
   begun[pos] = value;
 }
-
+*/
