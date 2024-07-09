@@ -27,6 +27,11 @@ const int ports[NumPorts][NumPins] = {
 
 SevSeg sevseg;
 
+//Serial.println("Initializing the seven segment");
+
+
+//begin(sese, bestport, 1);
+
 unsigned long previousMillis = 0;
 
 void setup() {
@@ -35,23 +40,23 @@ void setup() {
     for (int i; i<LEN(ports); i++){
     Initiate(i);
   }
-  
+
 }
 
 void loop() {
-  unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= delaytime) {
+  //unsigned long currentMillis = millis();
+  //if (currentMillis - previousMillis >= delaytime) {
     // save the last time you blinked the LED
-    previousMillis = currentMillis;
+    //previousMillis = currentMillis;
 
     int sensorval1 = analogRead(sensor1);
     char sensorval1str[5];
     sprintf(sensorval1str,"%d", sensorval1);
-    Serial.println("Sensor Value is ");
-    Serial.print(sensorval1str);
+    //Serial.println("Sensor Value is ");
+    //Serial.print(sensorval1str);
     ExtDisp(sensorval1str);
     
-    Serial.println("codes is ");
+    /*Serial.println("codes is ");
     Serial.print(codes[0]);
     Serial.println("types is ");
     Serial.print(types[0]);
@@ -60,12 +65,13 @@ void loop() {
     Serial.println("Display Value is ");
     Serial.println(analogRead(A0));
     memset(used, 0, NumPorts);
-  }
+    */
+  //}
 
 }
 
 void ExtDisp(char printstring[]){
-
+  unsigned long currentMillis = millis();
   /*for(byte i = 0; i <= LEN(types)-1; i++){
     if(types[i] == 1 & codes[i] == licr){
       
@@ -77,6 +83,8 @@ void ExtDisp(char printstring[]){
     else{
       Serial.println("Display not found, printstring is %s", printstring)
     }*/
+  if (currentMillis - previousMillis >= 1000) {
+    previousMillis = currentMillis;
 
     int bestport = BestPort(DisplayCode);
     if(codes[bestport] == licr){
@@ -94,33 +102,35 @@ void ExtDisp(char printstring[]){
 
     else if(codes[bestport] == sese){
       
+      if(begun[bestport] != sese){
+        Serial.println("Initializing the seven segment");
+
+        byte numDigits = 4;
+        byte digitPins[] = {ports[bestport][0], ports[bestport][1], ports[bestport][2], ports[bestport][3]};
+        byte segmentPins[] = {ports[bestport][4], ports[bestport][5], ports[bestport][6], ports[bestport][7], ports[bestport][8], ports[bestport] [9], ports[bestport][10], ports[bestport][11]};
+        bool resistorsOnSegments = false; // 'false' means resistors are on digit pins
+        byte hardwareConfig = COMMON_CATHODE; // See README.md for options
+        bool updateWithDelays = false; // Default. Recommended
+        bool leadingZeros = false;
+
+        sevseg.begin(hardwareConfig, numDigits, digitPins, segmentPins, resistorsOnSegments, updateWithDelays, leadingZeros);
+        sevseg.setBrightness(90);
+        begin(sese, bestport, 1);
+      }
+      
       Serial.println("Printing on Seven segment");
       Serial.println("The print Value is ");
       Serial.print(printstring);
-      SevSeg sevseg;
-
-      byte numDigits = 4;
-      byte digitPins[] = {ports[bestport][0], ports[bestport][1], ports[bestport][2], ports[bestport][3]};
-      byte segmentPins[] = {ports[bestport][4], ports[bestport][5], ports[bestport][6], ports[bestport][7], ports[bestport][8], ports[bestport][9], ports[bestport][10], ports[bestport][11]};
-      bool resistorsOnSegments = false; // 'false' means resistors are on digit pins
-      byte hardwareConfig = COMMON_CATHODE; // See README.md for options
-      bool updateWithDelays = false; // Default. Recommended
-      bool leadingZeros = false;
-
-      sevseg.begin(hardwareConfig, numDigits, digitPins, segmentPins, resistorsOnSegments, updateWithDelays, leadingZeros);
-      sevseg.setBrightness(90);
-
-      sevseg.refreshDisplay();
-
       sevseg.setChars(printstring);
-
     }
 
-    else{
-      Serial.println("LCD not connected");
-    }
+  else{
+    Serial.println("LCD not connected");
+  }
 
   }
+  sevseg.refreshDisplay();
+}
 
 
 int BestPort(int typeOfComponent){
@@ -186,9 +196,11 @@ void Initiate(int i){
 }
 
 
-/*void begin(int value, int pos, bool replace){
+void begin(int value, int pos, bool replace){
+  Serial.println("Inside begin");
   if(replace){
     for(int i=0; i < NumPorts; i++){
+      Serial.println("Inside begin");
       if(begun[i] == value){
         begun[i] = 0;
       }
@@ -196,4 +208,4 @@ void Initiate(int i){
   }
   begun[pos] = value;
 }
-*/
+
