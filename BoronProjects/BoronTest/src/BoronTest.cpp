@@ -1,38 +1,46 @@
-/* 
- * Project myProject
- * Author: Your Name
- * Date: 
- * For comprehensive documentation and examples, please visit:
- * https://docs.particle.io/firmware/best-practices/firmware-template/
- */
-
-// Include Particle Device OS APIs
 #include "Particle.h"
 
-// Let Device OS manage the connection to the Particle Cloud
 SYSTEM_MODE(SEMI_AUTOMATIC);
 
-// Run the application and system concurrently in separate threads
-SYSTEM_THREAD(ENABLED);
+const char* serviceUuid = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
+const char* characteristicUuid = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
 
-// Show system, cloud connectivity, and application logs over USB
-// View logs with CLI using 'particle se6rial monitor --follow'
-SerialLogHandler logHandler(LOG_LEVEL_INFO);
+BleUuid serviceUuidObj(serviceUuid);
+BleUuid characteristicUuidObj(characteristicUuid);
 
-// setup() runs once, when the device is first turned on
-void setup() {
-  // Put initialization like pinMode and begin functions here
-  Particle.connect();
-  Log.info("Sending Hello World to the cloud!");
-  Particle.publish("Hello world!");
+BleCharacteristic peerCharacteristic;
+BlePeerDevice peer;
+
+void onDataReceived(const uint8_t* data, size_t len, const BlePeerDevice& peer) {
+  String receivedValue((const char*)data, len);
+  Serial.println("Received Value: " + receivedValue);
+  // Respond to the received value if needed
+  peerCharacteristic.setValue("ACK from Boron");
 }
 
-// loop() runs over and over again, as quickly as it can execute.
-void loop() {
-  // The core of your code will likely live here.
+void setup() {
+  Serial.begin(115200);
+  BLE.on();
+  peerCharacteristic.onDataReceived(onDataReceived);
+  BLE.addCharacteristic(peerCharacteristic);
+  peerCharacteristic.setProperties(BLERead | BLEWrite | BLENotify);
+  peerCharacteristic.setUuid(characteristicUuidObj);
 
-  // Example: Publish event to cloud every 10 seconds. Uncomment the next 3 lines to try it!
-  //Log.info("Sending Hello World to the cloud!");
-  //Particle.publish("Hello world!");
-  //delay( 10 * 1000 ); // milliseconds and blocking - see docs for more info!
+  BLE.scanForUuid(serviceUuidObj);
+}
+
+void loop() {
+  if (BLE.connected()) {
+    if (peer.connected() == false) {
+      peer = BLE.connectedPeer();
+      Serial.println("Connected to peer device!");
+    }
+  }
+  else {
+    if (peer.connected()) {
+      peer.disconnect();
+      Serial.println("Disconnected from peer device!");
+      BLE.scanForUuid(serviceUuidObj);
+    }
+  }
 }
