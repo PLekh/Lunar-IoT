@@ -1,6 +1,9 @@
 #include <Arduino.h>
 #include <LiquidCrystal.h>
 #include "SevSeg.h"
+#include <SoftwareSerial.h>
+
+SoftwareSerial softSerial(A5,A4);
 
 #define LEN(arr) ((int) (sizeof (arr) / sizeof (arr)[0]))
 #define closeTo(num, check) (num > check -10 & num < check + 10)
@@ -36,6 +39,7 @@ unsigned long previousMillis = 0;
 
 void setup() {
   Serial.begin(9600);
+  softSerial.begin(9600);
   //delay(1000);
     for (int i; i<LEN(ports); i++){
     Initiate(i);
@@ -49,13 +53,17 @@ void loop() {
     // save the last time you blinked the LED
     //previousMillis = currentMillis;
 
-    int sensorval1 = analogRead(sensor1);
+    /*int sensorval1 = analogRead(sensor1);
     char sensorval1str[5];
     sprintf(sensorval1str,"%d", sensorval1);
     //Serial.println("Sensor Value is ");
     //Serial.print(sensorval1str);
     ExtDisp(sensorval1str);
-    
+*/
+    int mss = softSerial.read();
+    char printval[5];
+    sprintf(printval,"%d", mss);
+    ExtDisp(printval);
     /*Serial.println("codes is ");
     Serial.print(codes[0]);
     Serial.println("types is ");
@@ -122,6 +130,8 @@ void ExtDisp(char printstring[]){
       Serial.println("The print Value is ");
       Serial.print(printstring);
       sevseg.setChars(printstring);
+      //sevseg.refreshDisplay();
+
     }
 
   else{
